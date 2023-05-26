@@ -10,34 +10,36 @@ function check_connection(){
     if ($socket)  return true;
     return false;
 }
-
-function getFilePaths($folderPath, $mime = null) {
-    $filePaths = array();
-    $files = scandir($folderPath);
-
-    foreach ($files as $file) {
-        if ($file === '.' || $file === '..') {
-            continue;
-        }
-
-        $filePath = $folderPath . '/' . $file;
-
-        if (is_file($filePath)) {
-            if(!empty($mime)){
-                $mime_file = explode('.', $filePath);
-                $mime_file = $mime_file[count($mime_file) - 1];
-                if($mime_file == $mime) $filePaths[] = $filePath;
-            }else{
-                $filePaths[] = $filePath;
+if(!function_exists('getFilePaths')){
+    function getFilePaths($folderPath, $mime = null) {
+        $filePaths = array();
+        $files = scandir($folderPath);
+    
+        foreach ($files as $file) {
+            if ($file === '.' || $file === '..') {
+                continue;
             }
-            
-        } elseif (is_dir($filePath)) {
-            $filePaths = array_merge($filePaths, getFilePaths($filePath));
+    
+            $filePath = $folderPath . '/' . $file;
+    
+            if (is_file($filePath)) {
+                if(!empty($mime)){
+                    $mime_file = explode('.', $filePath);
+                    $mime_file = $mime_file[count($mime_file) - 1];
+                    if($mime_file == $mime) $filePaths[] = $filePath;
+                }else{
+                    $filePaths[] = $filePath;
+                }
+                
+            } elseif (is_dir($filePath)) {
+                $filePaths = array_merge($filePaths, getFilePaths($filePath));
+            }
         }
+    
+        return $filePaths;
     }
-
-    return $filePaths;
 }
+
 
 function editvideo($inputVideo, $inputAudio, $path_excute){
     // $exce;
@@ -123,4 +125,42 @@ function request($url, $method = 'GET', $data = null, $headers = []) {
 
     // Trả về phản hồi
     return $response;
+}
+if(!function_exists('upload_fb')){
+function upload_fb($folder){
+    $desc = @file_get_contents(PRESET.'/description.txt');
+    $desc = explode(PHP_EOL, $desc);
+    $desc = $desc[array_rand($desc)];
+    $arr_file = getFilePaths($folder);
+    $arr_video_uploaded = @file_get_contents(PRESET.'/uploaded.txt');
+    $arr_video_uploaded = explode(PHP_EOL, $arr_video_uploaded);
+
+    foreach($arr_file as $video){
+        if(in_array($video, $arr_video_uploaded)) continue;
+        upload_reel_page($video, $desc);
+        $fileHandle = fopen(PRESET.'/uploaded.txt', 'a');
+        if ($fileHandle) {
+            // Di chuyển con trỏ tệp đến cuối file
+            fseek($fileHandle, 0, SEEK_END);
+            // Ghi dữ liệu vào vị trí cuối file
+            fwrite($fileHandle, PHP_EOL.$video);
+            // Đóng file
+            fclose($fileHandle);
+        } 
+        break;
+    }
+}
+}
+
+function count_file($folder){
+    $files = scandir($folder);
+
+    $fileCount = 0;
+    foreach ($files as $file) {
+        // Loại bỏ các thư mục và tệp tin ẩn (bắt đầu bằng dấu chấm)
+        if (!is_dir($file) && !in_array($file, ['.', '..']) && $file[0] !== '.') {
+            $fileCount++;
+        }
+    }
+    return $fileCount;
 }
