@@ -2,13 +2,13 @@
 
 function login_fb(){
     $fb = new \Facebook\Facebook([
-        'app_id' => '384171343855499',
-        'app_secret' => 'd0d19eddda03e65338fbcdf7bbc0b55c',
-        'default_graph_version' => 'v15.0',
+        'app_id' => env("FACEBOOK_APP_ID"),
+        'app_secret' => env("FACEBOOK_APP_SECRET"),
+        'default_graph_version' => env("FACEBOOK_APP_VER"),
       ]);
       $helper = $fb->getRedirectLoginHelper();
       $permissions = ['pages_read_engagement', "pages_show_list", "pages_manage_posts"];
-      $loginUrl = $helper->getLoginUrl('https://www.facebook.com/connect/login_success.html', $permissions);
+      $loginUrl = $helper->getLoginUrl('https://congminh.name.vn/access.php', $permissions);
     echo "Vui long truy cap vào URL sau de đang nhap vao Facebook:\n\n";
     echo $loginUrl."&response_type=token";
     echo "\n\n";
@@ -43,6 +43,7 @@ function upload_reel_page($path_video, $desc){
     $id = $page->id;
 
     $data = request('https://graph.facebook.com/v15.0/'.$id.'/video_reels?upload_phase=start&access_token='.$access_token, 'POST');
+    echo $data."\n";
     $data = json_decode($data);
     if(empty($data->upload_url)) return false;
 
@@ -59,11 +60,13 @@ function upload_reel_page($path_video, $desc){
         ];
     
     $data = request($upload_url, 'POST', $file_data, $headers);
+    echo $data."\n";
     $data = json_decode($data);
     if($data->success){
         $data = request('https://graph.facebook.com/v15.0/'.$id.'/video_reels?video_id='.$video_id.'&upload_phase=finish&video_state=PUBLISHED&description='.urlencode($desc).'&access_token='.$access_token, 'POST');
+        echo $data."\n";
         $data = json_decode($data);
-        if($data->status) return true;
+        return $data->success;
     }
 
     return false;

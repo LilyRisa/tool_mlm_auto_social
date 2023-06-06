@@ -1,58 +1,144 @@
 <?php
 require 'loaded.php';
 $argv = $_SERVER['argv'];
-$type = $argv[1];
 
 // $path = $argv[1];
 // $audio = $argv[2];
 // $exce = $argv[3];
 
-if($type == '--convert' || $type == '-c'){
+if(count($argv) == 1){
+    while(true){
 
-    convert($argv[2], $argv[3], $argv[4]);
+        echo "===============\n";
+        echo "=     Tool    =\n";
+        echo "=             =\n";
+        echo "===============\n";
+        echo "1. Convert video\n";
+        echo "2. Get access token facebook\n";
+        echo "3. Chon page upload\n";
+        echo "4. Upload facebook reel\n";
+        echo "5. Login google\n";
+        echo "0. exit\n";
 
-}else if($type == '--login-facebook' || $type == '-lf'){
-    $page_id = $argv[2];
-    login_fb();
-
-
-}else if($type == '--upload-facebook' || $type == '-uf'){
-    $data = show_page();
-    echo "==== Chon page: ===\n";
-    foreach($data as $key => $page){
-        echo "($key) {$page->name} ({$page->id})\n";
+        $key = readline("Chon: ");
+        if($key == 1){
+            echo "===================\n";
+            echo "=       Tool      =\n";
+            echo "=  Convert video  =\n";
+            echo "===================\n";
+            $param1 = readline("Nhap duong dan video goc: ");
+            $param2 = readline("Nhap duong dan chua audio: ");
+            $param3 = readline("Nhap duong dan xuat file: ");
+            convert($param1, $param2, $param3);
+        }else if($key == 2){
+            echo "===================\n";
+            echo "=       Tool      =\n";
+            echo "=  login facebook =\n";
+            echo "===================\n";
+            login_fb();
+        }else if($key == 3){
+            echo "===================\n";
+            echo "=       Tool      =\n";
+            echo "=  page facebook  =\n";
+            echo "===================\n";
+            echo "\n";
+            $data = show_page();
+            echo "==== Chon page: ===\n";
+            foreach($data as $key => $page){
+                echo "($key) {$page->name} ({$page->id})\n";
+            }
+            $key = readline("Nhap key: ");
+            $page_select = $data[$key];
+            @file_put_contents(PRESET.'/access_token_page.txt', json_encode($page_select));
+        }else if($key == 4){
+            echo "===================\n";
+            echo "=       Tool      =\n";
+            echo "= Upload facebook =\n";
+            echo "===================\n";
+            echo "\n";
+            $folder = readline("Nhap duong dan video: ");
+            upload_fb($folder);
+        }else if($key == 5){
+            echo "===================\n";
+            echo "=       Tool      =\n";
+            echo "= Upload facebook =\n";
+            echo "===================\n";
+            echo "\n";
+            $clientId = '585734117891-mlmfgcudv95l4h527p2tq429i7cdkkig.apps.googleusercontent.com';
+            $clientSecret = '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';
+            echo "Mo url nay tren trinh duyet\n";
+            echo gen_url_getaccesstoken();
+            echo "\n";
+            $url_code = readline("Nhap url tra ve: ");
+            preg_match('/code=([^&]+)/', $url_code, $matches);
+            if(isset($matches[1])){
+                $token = exchangeCodeForAccessToken(urldecode($matches[1]));
+                @file_put_contents(PRESET.'/google_refesh.txt',$token['refesh']);
+            }
+            echo "Set token success\n";
+        }else if($key == 0){
+            break;
+        }
     }
+}else{
+    $type = $argv[1];
+    if($type == '--convert' || $type == '-c'){
 
-    $key = readline("Nhap key: ");
-    $page_select = $data[$key];
-    @file_put_contents(PRESET.'/access_token_page.txt', json_encode($page_select));
-}else if($type == '--cron-upload-facebook' || $type == '-cuf'){
-    $folder = $argv[2];
-
-    $arr_file = getFilePaths($folder);
-    $arr_video_uploaded = @file_get_contents(PRESET.'/uploaded.txt');
-    $arr_video_uploaded = explode(PHP_EOL, $arr_video_uploaded);
-
-    foreach($arr_file as $video){
-        if(in_array($video, $arr_video_uploaded)) continue;
-        upload_reel_page($video, isset($argv[3]) ? $argv[3] : 'Thế giới tiện ích đồ da dụng giá tốt');
-        $fileHandle = fopen(PRESET.'/uploaded.txt', 'a');
-        if ($fileHandle) {
-            // Di chuyển con trỏ tệp đến cuối file
-            fseek($fileHandle, 0, SEEK_END);
-            // Ghi dữ liệu vào vị trí cuối file
-            fwrite($fileHandle, PHP_EOL.$video);
-            // Đóng file
-            fclose($fileHandle);
-        } 
-        break;
+        convert($argv[2], $argv[3], $argv[4]);
+    
+    }else if($type == '--login-facebook' || $type == '-lf'){
+        $page_id = $argv[2];
+        login_fb();
+    
+    
+    }else if($type == '--upload-facebook' || $type == '-uf'){
+        $data = show_page();
+        echo "==== Chon page: ===\n";
+        foreach($data as $key => $page){
+            echo "($key) {$page->name} ({$page->id})\n";
+        }
+    
+        $key = readline("Nhap key: ");
+        $page_select = $data[$key];
+        @file_put_contents(PRESET.'/access_token_page.txt', json_encode($page_select));
+        echo "Lu du lieu page thanh cong !\n";
+    }else if($type == '--cron-upload-facebook' || $type == '-cuf'){
+        $folder = $argv[2];
+        // $count = count_file($folder);
+        // for($i = 0; $i < 10; $i++){
+        //     upload_fb($folder);
+        //     sleep(5);
+        // }
+        upload_fb($folder);
+        
+    }else if($type == '--login-instagram' || $type == '-li'){
+        login_ig();
+        
+    }else if($type == '--upload-youtube' || $type == '-uy'){
+        $access_token = get_access_token();
+        if(empty($access_token)) throw new \Exception('lOGIN LAI GOOGLE DE LAY DU LIEU DANG NHAP MOI NHAT!');
+        $folder = $argv[2];
+        $arr_file = getFilePaths($folder);
+        $arr_video_uploaded = @file_get_contents(PRESET.'/uploaded_yt.txt');
+        $arr_video_uploaded = explode(PHP_EOL, $arr_video_uploaded);
+        foreach($arr_file as $video){
+            if(in_array($video, $arr_video_uploaded)) continue;
+            if(upload_youtube_short($video, $access_token)){
+                $fileHandle = fopen(PRESET.'/uploaded_yt.txt', 'a');
+                if ($fileHandle) {
+                    // Di chuyển con trỏ tệp đến cuối file
+                    fseek($fileHandle, 0, SEEK_END);
+                    // Ghi dữ liệu vào vị trí cuối file
+                    fwrite($fileHandle, PHP_EOL.$video);
+                    // Đóng file
+                    fclose($fileHandle);
+                }
+                echo "Tai len thanh cong!\n";
+                break;
+            }
+        }
+        
     }
 }
-
-
-
-
-
-
 
 ?>

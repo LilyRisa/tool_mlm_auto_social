@@ -1,18 +1,21 @@
 <?php
 require_once 'vendor/autoload.php';
 
+$_data_env = file_get_contents('./.env');
+$_data_env = explode(PHP_EOL, $_data_env);
+
+foreach($_data_env as $env){
+    if($env)
+    putenv($env);
+}
+
 define('PRESET', __DIR__.'/preset');
 
 session_start();
 
-$common = 'common/';
-$services = 'services/';
-$files_common = glob($common . '*');
-$files_services = glob($services . '*');
-$files = array_merge($files_common, $files_services);
+require 'common/functional.php';
+require 'common/facebook.php';
+require 'common/instagram.php';
+require 'common/youtubeshort.php';
+require 'services/convert.php';
 
-foreach ($files as $file) {
-    if (is_file($file)) {
-        require $file;
-    }
-}
