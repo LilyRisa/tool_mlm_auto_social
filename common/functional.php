@@ -58,7 +58,7 @@ function editvideo($inputVideo, $inputAudio, $path_excute){
 
     // Chèn nhạc vào video tạm thời
     $audioCommand = "-i \"{$inputAudio}\" -c:a aac";
-    $ffmpegAudioCommand =  LIB."/ffmpeg/ffmpeg.exe -hide_banner -loglevel panic -i {$tmpVideo} {$audioCommand} -c:v copy -map 0:v:0 -map 1:a:0 -shortest -y \"{$outputVideo}\"";
+    $ffmpegAudioCommand =  LIB."/ffmpeg/ffmpeg.exe -hide_banner -loglevel panic -i \"{$tmpVideo}\" {$audioCommand} -c:v copy -map 0:v:0 -map 1:a:0 -shortest -y \"{$outputVideo}\"";
     // exec($ffmpegAudioCommand);
 
     $process = proc_open($ffmpegAudioCommand, [
