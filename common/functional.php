@@ -52,7 +52,7 @@ function editvideo($inputVideo, $inputAudio, $path_excute){
     // Tắt âm thanh của video gốc và xuất video tạm thời
     $tmpVideo = $path_excute. "/".basename($inputVideo)."_tmp_video.mp4";
     $muteCommand = "-an";
-    $ffmpegVideoCommand = LIB."/ffmpeg/ffmpeg.exe -hide_banner -loglevel panic -i \"{$inputVideo}\" {$flipCommand} {$muteCommand} -c:v libx264 -y {$tmpVideo}";
+    $ffmpegVideoCommand = LIB."/ffmpeg/ffmpeg.exe -hide_banner -loglevel panic -i \"{$inputVideo}\" {$flipCommand} {$muteCommand} -c:v libx264 -y \"{$tmpVideo}\"";
 
     exec($ffmpegVideoCommand);
 
