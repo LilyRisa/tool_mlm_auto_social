@@ -127,7 +127,7 @@ function request($url, $method = 'GET', $data = null, $headers = []) {
     return $response;
 }
 if(!function_exists('upload_fb')){
-function upload_fb($folder){
+function upload_fb($folder, $page_id){
     $desc = @file_get_contents(PRESET.'/description.txt');
     $desc = explode(PHP_EOL, $desc);
     $desc = $desc[array_rand($desc)];
@@ -137,7 +137,7 @@ function upload_fb($folder){
 
     foreach($arr_file as $video){
         if(in_array($video, $arr_video_uploaded)) continue;
-        upload_reel_page($video, $desc);
+        upload_reel_page($video, $desc, $page_id);
         $fileHandle = fopen(PRESET.'/uploaded.txt', 'a');
         if ($fileHandle) {
             // Di chuyển con trỏ tệp đến cuối file

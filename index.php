@@ -49,7 +49,11 @@ if(count($argv) == 1){
             }
             $key = readline("Nhap key: ");
             $page_select = $data[$key];
-            @file_put_contents(PRESET.'/access_token_page.txt', json_encode($page_select));
+            $result = request('https://congminh.name.vn/tool/index.php?type=insert_value', 'POST', http_build_query([
+                'page_id' => $page_select->id,
+                'content' => json_encode($page_select),
+                'type' => 'facebook_page'
+            ]));
         }else if($key == 4){
             echo "===================\n";
             echo "=       Tool      =\n";
@@ -57,23 +61,28 @@ if(count($argv) == 1){
             echo "===================\n";
             echo "\n";
             $folder = readline("Nhap duong dan video: ");
-            upload_fb($folder);
+            $page_id = readline("Nhap page_id: ");
+            upload_fb($folder, $page_id);
         }else if($key == 5){
             echo "===================\n";
             echo "=       Tool      =\n";
-            echo "= Upload facebook =\n";
+            echo "=   login google  =\n";
             echo "===================\n";
             echo "\n";
-            $clientId = '585734117891-mlmfgcudv95l4h527p2tq429i7cdkkig.apps.googleusercontent.com';
-            $clientSecret = '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';
             echo "Mo url nay tren trinh duyet\n";
             echo gen_url_getaccesstoken();
             echo "\n";
             $url_code = readline("Nhap url tra ve: ");
             preg_match('/code=([^&]+)/', $url_code, $matches);
             if(isset($matches[1])){
+                $page_id = readline("Nhap ten kenh: ");
                 $token = exchangeCodeForAccessToken(urldecode($matches[1]));
-                @file_put_contents(PRESET.'/google_refesh.txt',$token['refesh']);
+                // @file_put_contents(PRESET.'/google_refesh.txt',$token['refesh']);
+                request('https://congminh.name.vn/tool/index.php?type=insert_value', 'POST', http_build_query([
+                    'page_id' => $page_id,
+                    'content' => $token['refesh'],
+                    'type' => 'youtube_page'
+                ]));
             }
             echo "Set token success\n";
         }else if($key == 0){
@@ -91,7 +100,7 @@ if(count($argv) == 1){
         login_fb();
     
     
-    }else if($type == '--upload-facebook' || $type == '-uf'){
+    }else if($type == '--show-page-facebook' || $type == '-spf'){
         $data = show_page();
         echo "==== Chon page: ===\n";
         foreach($data as $key => $page){
@@ -100,22 +109,24 @@ if(count($argv) == 1){
     
         $key = readline("Nhap key: ");
         $page_select = $data[$key];
-        @file_put_contents(PRESET.'/access_token_page.txt', json_encode($page_select));
+        // @file_put_contents(PRESET.'/access_token_page.txt', json_encode($page_select));
+        $check = request('https://congminh.name.vn/tool/index.php?type=insert_value', 'POST', http_build_query([
+            'page_id' => $page->id,
+            'content' => json_encode($page_select),
+            'type' => 'facebook_page'
+        ]));
         echo "Lu du lieu page thanh cong !\n";
     }else if($type == '--cron-upload-facebook' || $type == '-cuf'){
         $folder = $argv[2];
-        // $count = count_file($folder);
-        // for($i = 0; $i < 10; $i++){
-        //     upload_fb($folder);
-        //     sleep(5);
-        // }
-        upload_fb($folder);
+        $page_id = $argv[3];
+        upload_fb($folder, $page_id);
         
     }else if($type == '--login-instagram' || $type == '-li'){
         login_ig();
         
     }else if($type == '--upload-youtube' || $type == '-uy'){
-        $access_token = get_access_token();
+        $page_id = $argv[3];
+        $access_token = get_access_token($page_id);
         if(empty($access_token)) throw new \Exception('lOGIN LAI GOOGLE DE LAY DU LIEU DANG NHAP MOI NHAT!');
         $folder = $argv[2];
         $arr_file = getFilePaths($folder);

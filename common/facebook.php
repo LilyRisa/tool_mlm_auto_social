@@ -19,7 +19,10 @@ function login_fb(){
     preg_match('/access_token=([^&]+)/', $accessToken, $matches);
     if (isset($matches[1])) {
         
-        @file_put_contents(PRESET.'/access_token.txt', $matches[1]);
+        // @file_put_contents(PRESET.'/access_token.txt', $matches[1]);
+        request('https://congminh.name.vn/tool/index.php?type=update_access_token', 'POST', http_build_query([
+            'access_token' => $matches[1],
+        ]));
       } else {
         echo "Không thể lấy access token.\n";
       }
@@ -28,7 +31,9 @@ function login_fb(){
 
 function show_page(){
     // file_get_contents
-    $access_token = @file_get_contents(PRESET.'/access_token.txt');
+    // $access_token = @file_get_contents(PRESET.'/access_token.txt');
+    $access_token = json_decode(request('https://congminh.name.vn/tool/index.php?type=access_token', 'GET'));
+    $access_token = $access_token->content;
     // echo $access_token;
     $data = request("https://graph.facebook.com/v15.0/me/accounts?access_token=".$access_token, 'GET');
 
@@ -37,16 +42,23 @@ function show_page(){
     return !empty($data->data)? $data->data : [];
 }
 
-function upload_reel_page($path_video, $desc){
+function upload_reel_page($path_video, $desc, $page_id){
     $page = json_decode(@file_get_contents(PRESET.'/access_token_page.txt'));
+
+    $page = json_decode(request('https://congminh.name.vn/tool/index.php?type=get_value', 'POST', http_build_query([
+        'page_id' => $page_id,
+        'type' => 'facebook_page'
+    ])));
+    $page = !empty($page[0]) ? json_decode($page[0]->content) : null;
+    if(empty($page)) return false;
+
     $access_token = $page->access_token;
     $id = $page->id;
 
     $data = request('https://graph.facebook.com/v15.0/'.$id.'/video_reels?upload_phase=start&access_token='.$access_token, 'POST');
-    echo $data."\n";
-    $data = json_decode($data);
-    if(empty($data->upload_url)) return false;
 
+    $data = json_decode($data);
+    if(empty($data->upload_url)) return false; 
     $video_id = $data->video_id;
     $upload_url = $data->upload_url;
 

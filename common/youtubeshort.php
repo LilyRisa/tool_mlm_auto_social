@@ -91,15 +91,19 @@ function exchangeCodeForAccessToken($code)
         
         ]));
     $data = json_decode($data);
-    // var_dump($data);
     if(isset($data->access_token)) return ['token' => $data->access_token, 'refesh' => $data->refresh_token];
     return null;
 }
 
-function get_access_token(){
-    $data = @file_get_contents(PRESET.'/google_refesh.txt');
+function get_access_token($page_id){
+    // $data = @file_get_contents(PRESET.'/google_refesh.txt');
+    $data = json_decode(request('https://congminh.name.vn/tool/index.php?type=get_value', 'POST', http_build_query([
+        'page_id' => $page_id,
+        'type' => 'youtube_page'
+    ])));
     if(empty($data)) return null;
-
+    $data = $data[0]->content;
+    
     $clientId = env("GOOGLE_CLIENT_ID");
     $clientSecret = env("GOOGLE_CLIENT_SECRET");
 
