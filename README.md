@@ -25,15 +25,16 @@
  
 
 ### Khởi chạy
-
-- khởi chạy qua giao diện cli ``` php index.php ```
+- Import file db.sql vào database
+- Ứng dụng đã sử dụng database để lưu trữ nhiều tài khoản. Tải file ```server.php``` lên server và chỉnh sửa thông tin connect database để làm api cho ứng dụng chính
+- Lần đầu khởi chạy hãy khởi chạy qua giao diện cli ``` php index.php ``` để tạo thông tin đăng nhập và lưu trữ database thông qua api
 - Chạy các tính năng cụ thể :
 - ``` php index.php --convert {video folder path} {audio folder path} {excute path}``` hoặc ``` php index.php -c {video folder path} {audio folder path} {excute path}``` để chỉnh sửa tất cả video trong thư mục {video folder path} và ghép ngẫu nhiên các bản nhạc từ {audio folder path} sau đó xuất video mới ra {excute path}
     - Ví dụ: ``` php index.php -c "K:\reup\video" "K:\reup\audio" "K:\reup\excute" ```
-- ``` php index.php --upload-facebook``` hoặc ``` php index.php -uf``` để hiển thị ra các page mà tài khoản facebook có quyền upload post và chọn page muốn đăng tải video
-- ``` php index.php --cron-upload-facebook {video folder path}``` hoặc ``` php index.php -cuf {video folder path}``` để upload ngẫu nhiên 1 video trong thư mục video lên faceboo reel. Nếu thành công sẽ lưu lại đường dẫn tránh trùng lặp video upload 
-    - ví dụ: ``` php index.php ----cron-upload-facebook "K:\reup\excute"```
-- ``` php index.php --upload-youtube {video folder path}``` hoặc ``` php index.php -uy {video folder path}``` để upload ngẫu nhiên 1 video trong thư mục video lên youtube short
+- ``` php index.php --show-page-facebook``` hoặc ``` php index.php -spf``` để hiển thị ra các page mà tài khoản facebook có quyền upload post và chọn page muốn đăng tải video
+- ``` php index.php --cron-upload-facebook {video folder path} {page id}``` hoặc ``` php index.php -cuf {video folder path}``` để upload ngẫu nhiên 1 video trong thư mục video lên facebook reel. Nếu thành công sẽ lưu lại đường dẫn tránh trùng lặp video upload (page id là thông tin lưu trữ trong database)
+    - ví dụ: ``` php index.php ----cron-upload-facebook "K:\reup\excute" "2312421471236"```
+- ``` php index.php --upload-youtube {video folder path} {tên kênh}``` hoặc ``` php index.php -uy {video folder path} {tên kênh}``` để upload ngẫu nhiên 1 video trong thư mục video lên youtube short (Tên kênh lưu trữ trong database)
 
 
 ## Tech Stack
