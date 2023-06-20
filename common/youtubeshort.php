@@ -1,6 +1,6 @@
 <?php
 
-function upload_youtube_short($videoPath, $accessToken)
+function upload_youtube_short($videoPath, $accessToken, $path_desc = null)
 {
     // $videoPath = 'path/to/your/video.mp4';
     $clientId = env("GOOGLE_CLIENT_ID");
@@ -24,13 +24,30 @@ function upload_youtube_short($videoPath, $accessToken)
     // var_dump($video);
     // var_dump($youtube);
     $snippet = new \Google_Service_YouTube_VideoSnippet();
-    $desc = @file_get_contents(PRESET.'/description.txt');
+    if($path_desc == null){
+        $desc = @file_get_contents(PRESET.'/description.txt');
+    }else{
+        $desc = @file_get_contents($path_desc);
+    }
+    
     $desc = explode(PHP_EOL, $desc);
     $desc = $desc[array_rand($desc)];
-    $title = str_replace('#tienichcongminh', '', $desc);
+    // $title = str_replace('#tienichcongminh', '', $desc);
+    preg_match_all("/#\w+/", $desc, $matches);
+    $tags = $matches[0];
+    if(!empty($tags)){
+        foreach($tags as $k => $tg){
+            $tags[$k] = str_replace('#', '', $tg);
+        }
+    }
+    $title = preg_replace("/#\w+/", "", $desc);
+    // var_dump($tags);
+    // var_dump($title);
+    // var_dump($desc);
+
     $snippet->setTitle($title);
-    $snippet->setDescription($desc.' #short #tienichcongminh');
-    $snippet->setTags(['tienichcongminh']);
+    $snippet->setDescription($desc.' #short');
+    $snippet->setTags($tags);
     $video->setSnippet($snippet);
 
     // Đặt thuộc tính status của video

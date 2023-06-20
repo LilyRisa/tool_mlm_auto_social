@@ -1,7 +1,7 @@
 <?php
 require_once 'vendor/autoload.php';
 
-$_data_env = file_get_contents('./.env');
+$_data_env = file_get_contents(__DIR__.'/.env');
 $_data_env = explode(PHP_EOL, $_data_env);
 
 foreach($_data_env as $env){
@@ -11,7 +11,6 @@ foreach($_data_env as $env){
 
 define('PRESET', __DIR__.'/preset');
 
-session_start();
 
 require 'common/functional.php';
 require 'common/facebook.php';

@@ -126,6 +126,12 @@ if(count($argv) == 1){
         
     }else if($type == '--upload-youtube' || $type == '-uy'){
         $page_id = $argv[3];
+        $desc_text = null;
+        if(isset($argv[4])){
+            if($argv[4] != null){
+                $desc_text = $argv[4];
+            }
+        }
         $access_token = get_access_token($page_id);
         if(empty($access_token)) throw new \Exception('lOGIN LAI GOOGLE DE LAY DU LIEU DANG NHAP MOI NHAT!');
         $folder = $argv[2];
@@ -134,7 +140,7 @@ if(count($argv) == 1){
         $arr_video_uploaded = explode(PHP_EOL, $arr_video_uploaded);
         foreach($arr_file as $video){
             if(in_array($video, $arr_video_uploaded)) continue;
-            if(upload_youtube_short($video, $access_token)){
+            if(upload_youtube_short($video, $access_token, $desc_text)){
                 $fileHandle = fopen(PRESET.'/uploaded_yt.txt', 'a');
                 if ($fileHandle) {
                     // Di chuyển con trỏ tệp đến cuối file
