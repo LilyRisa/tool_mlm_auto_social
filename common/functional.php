@@ -127,8 +127,13 @@ function request($url, $method = 'GET', $data = null, $headers = []) {
     return $response;
 }
 if(!function_exists('upload_fb')){
-function upload_fb($folder, $page_id){
-    $desc = @file_get_contents(PRESET.'/description.txt');
+function upload_fb($folder, $page_id, $desc_txt = null){
+    if($desc_txt == null){
+        $desc = @file_get_contents(PRESET.'/description.txt');
+    }else{
+        $desc = @file_get_contents($desc_txt);
+    }
+    
     $desc = explode(PHP_EOL, $desc);
     $desc = $desc[array_rand($desc)];
     $arr_file = getFilePaths($folder);

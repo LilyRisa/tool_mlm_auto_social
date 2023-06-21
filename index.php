@@ -62,7 +62,9 @@ if(count($argv) == 1){
             echo "\n";
             $folder = readline("Nhap duong dan video: ");
             $page_id = readline("Nhap page_id: ");
-            upload_fb($folder, $page_id);
+            $desc = readline("Nhap duong dan file description: ");
+            if($desc == '') $desc = null;
+            upload_fb($folder, $page_id, $desc);
         }else if($key == 5){
             echo "===================\n";
             echo "=       Tool      =\n";
@@ -119,7 +121,12 @@ if(count($argv) == 1){
     }else if($type == '--cron-upload-facebook' || $type == '-cuf'){
         $folder = $argv[2];
         $page_id = $argv[3];
-        upload_fb($folder, $page_id);
+        $desc = null;
+        if(isset($argv[4])){
+            $desc = $argv[4];
+        }
+
+        upload_fb($folder, $page_id, $desc);
         
     }else if($type == '--login-instagram' || $type == '-li'){
         login_ig();
